@@ -1,0 +1,10 @@
+# Dependencies
+
+# Environment
+node_modules/
+.env
+.env.*
+
+# IDE
+.idea/
+.vscode/
