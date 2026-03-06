@@ -1,7 +1,6 @@
 import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import { IonApp, IonRouterOutlet, IonTabBar, IonTabButton, IonLabel, setupIonicReact, IonTabs } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import Home from './pages/Home';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -32,20 +31,50 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import Routines from './pages/Routines';
+import Workouts from './pages/Workouts';
+import Exercises from './pages/Exercises';
 
 setupIonicReact();
 
 const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
-      <IonRouterOutlet>
-        <Route exact path="/home">
-          <Home />
-        </Route>
-        <Route exact path="/">
-          <Redirect to="/home" />
-        </Route>
-      </IonRouterOutlet>
+      <IonTabs>
+        <IonRouterOutlet>
+          <Route exact path="/workouts">
+            <Workouts />
+          </Route>
+
+          <Route exact path="/routines">
+            <Routines />
+          </Route>
+
+          <Route exact path="/exercises">
+            <Exercises />
+          </Route>
+
+          <Route exact path="/">
+            <Redirect to="/workouts" />
+          </Route>
+
+        </IonRouterOutlet>
+
+        <IonTabBar slot="bottom">
+          <IonTabButton tab="workouts" href="/workouts">
+            <IonLabel>Workouts</IonLabel>
+          </IonTabButton>
+
+          <IonTabButton tab="routines" href="/routines">
+            <IonLabel>Routines</IonLabel>
+          </IonTabButton>
+
+          <IonTabButton tab="exercises" href="/exercises">
+            <IonLabel>Exercises</IonLabel>
+          </IonTabButton>
+        </IonTabBar>
+
+      </IonTabs>
     </IonReactRouter>
   </IonApp>
 );
