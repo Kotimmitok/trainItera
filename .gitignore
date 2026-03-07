@@ -2,6 +2,7 @@
 
 # Environment
 node_modules/
+dist/
 .env
 .env.*
 
