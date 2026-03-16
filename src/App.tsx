@@ -34,11 +34,25 @@ import './theme/variables.css';
 import Routines from './pages/Routines';
 import Workouts from './pages/Workouts';
 import Exercises from './pages/Exercises';
+import { useEffect } from 'react';
+import { initDatabase } from './db';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
+const App: React.FC = () => {
+  useEffect(() => {
+    const init = async () => {
+      try {
+        await initDatabase();
+      } catch (err) {
+        console.error("Database init error:", err);
+      }
+    };
+
+    init();
+  }, []);
+
+  return <IonApp>
     <IonReactRouter>
       <IonTabs>
         <IonRouterOutlet>
@@ -77,6 +91,6 @@ const App: React.FC = () => (
       </IonTabs>
     </IonReactRouter>
   </IonApp>
-);
+};
 
 export default App;
