@@ -2,12 +2,14 @@ import {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent,
     IonList, IonItemSliding, IonItem, IonItemOptions, IonItemOption,
     IonLabel, IonButton, IonModal, IonInput, IonButtons,
-    useIonViewWillEnter
+    useIonViewWillEnter,
+    IonIcon
 } from '@ionic/react';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Routine } from '../db/models/routine.model';
 import { createRoutine, deleteRoutine, getRoutines } from '../db/repositories/routines.repository';
+import { addOutline, checkmark } from 'ionicons/icons';
 
 const Routines: React.FC = () => {
     const [routines, setRoutines] = useState<Routine[]>([]);
@@ -45,7 +47,15 @@ const Routines: React.FC = () => {
         <IonPage>
             <IonHeader>
                 <IonToolbar>
-                    <IonTitle>Routines</IonTitle>
+                    <IonButtons slot="start">
+                        <IonTitle>Routines</IonTitle>
+                    </IonButtons>
+                    <IonButtons slot="end">
+                        <IonButton color="primary" onClick={() => setIsOpen(true)}>
+                            <IonIcon slot="start" icon={addOutline} />
+                            Add Routine
+                        </IonButton>
+                    </IonButtons>
                 </IonToolbar>
             </IonHeader>
             <IonContent>
@@ -70,17 +80,16 @@ const Routines: React.FC = () => {
                     ))}
                 </IonList>
 
-                <IonButton expand="full" onClick={() => {
-                    setIsOpen(true)
-                }}>
-                    New Routine
-                </IonButton>
 
                 <IonModal isOpen={isOpen} onDidDismiss={() => setIsOpen(false)}>
                     <IonHeader>
                         <IonToolbar>
                             <IonTitle>New Routine</IonTitle>
                             <IonButtons slot="end">
+                                <IonButton color="primary" expand="full" onClick={handleAdd} className="ion-margin-top">
+                                    <IonIcon slot="start" icon={checkmark} />
+                                    Save
+                                </IonButton>
                                 <IonButton onClick={() => setIsOpen(false)}>Cancel</IonButton>
                             </IonButtons>
                         </IonToolbar>
@@ -92,9 +101,6 @@ const Routines: React.FC = () => {
                             value={name}
                             onIonInput={e => setName(e.detail.value!)}
                         />
-                        <IonButton expand="full" onClick={handleAdd} className="ion-margin-top">
-                            Save
-                        </IonButton>
                     </IonContent>
                 </IonModal>
             </IonContent>

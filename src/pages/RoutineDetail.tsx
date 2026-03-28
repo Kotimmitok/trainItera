@@ -139,6 +139,12 @@ const RoutineDetail: React.FC = () => {
                         }}
                         style={{ cursor: 'pointer' }}
                     >{routine?.name ?? 'Routine'}</IonTitle>
+                    <IonButtons slot="end">
+                        <IonButton color="primary" onClick={() => setIsPickerOpen(true)} className="ion-margin">
+                            <IonIcon slot="start" icon={addOutline} />
+                            Add Exercise
+                        </IonButton>
+                    </IonButtons>
                 </IonToolbar>
             </IonHeader>
             <IonContent>
@@ -169,10 +175,6 @@ const RoutineDetail: React.FC = () => {
                         </IonItemSliding>
                     ))}
                 </IonList>
-
-                <IonButton expand="full" onClick={() => setIsPickerOpen(true)} className="ion-margin">
-                    Add Exercise
-                </IonButton>
 
                 {/* Rename Routine Modal */}
                 <IonModal isOpen={isRenameOpen} onDidDismiss={() => setIsRenameOpen(false)} breakpoints={[0, 0.3]} initialBreakpoint={0.3}>
@@ -228,6 +230,10 @@ const RoutineDetail: React.FC = () => {
                         <IonToolbar>
                             <IonTitle>{editState?.exercise?.name}</IonTitle>
                             <IonButtons slot="end">
+                                <IonButton color="primary" onClick={handleAdd} className="ion-margin-top">
+                                    <IonIcon slot="start" icon={checkmark} />
+                                    {editState?.routineExerciseId ? 'Update Sets' : 'Add to Routine'}
+                                </IonButton>
                                 <IonButton onClick={() => setIsConfigOpen(false)}>Cancel</IonButton>
                             </IonButtons>
                         </IonToolbar>
@@ -277,10 +283,6 @@ const RoutineDetail: React.FC = () => {
                         <IonButton expand="full" fill="outline" onClick={handleAddSetRow} className="ion-margin-top">
                             <IonIcon slot="start" icon={addOutline} />
                             Add Set
-                        </IonButton>
-                        <IonButton expand="full" onClick={handleAdd} className="ion-margin-top">
-                            <IonIcon slot="start" icon={checkmark} />
-                            {editState?.routineExerciseId ? 'Update Sets' : 'Add to Routine'}
                         </IonButton>
                     </IonContent>
                 </IonModal>

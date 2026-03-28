@@ -2,12 +2,14 @@ import {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent,
     IonList, IonItemSliding, IonItem, IonItemOptions, IonLabel,
     IonItemOption, IonButton, IonModal, IonInput, IonButtons,
-    IonCheckbox, useIonViewWillEnter
+    IonCheckbox, useIonViewWillEnter,
+    IonIcon
 } from '@ionic/react';
 import { useState } from 'react';
 import { Exercise, MuscleGroup } from '../db/models/exercise.model';
 import { createExercise, deleteExercise, getExercises, updateExercise } from '../db/repositories/exercises.repository';
 import { getMuscleGroups } from '../db/repositories/muscle_groups.repository';
+import { addOutline, checkmark } from 'ionicons/icons';
 
 interface ExerciseEditState {
     id: number | null;
@@ -72,6 +74,12 @@ const Exercises: React.FC = () => {
             <IonHeader>
                 <IonToolbar>
                     <IonTitle>Exercises</IonTitle>
+                    <IonButtons slot="end">
+                        <IonButton color="primary" expand="full" onClick={openNew}>
+                            <IonIcon slot="start" icon={addOutline} />
+                            Add Exercise
+                        </IonButton>
+                    </IonButtons>
                 </IonToolbar>
             </IonHeader>
             <IonContent>
@@ -93,16 +101,13 @@ const Exercises: React.FC = () => {
                     ))}
                 </IonList>
 
-                <IonButton expand="full" onClick={openNew}>
-                    Add Exercise
-                </IonButton>
-
                 <IonModal isOpen={isOpen} onDidDismiss={() => setIsOpen(false)}>
                     <IonHeader>
                         <IonToolbar>
                             <IonTitle>{editState.id ? 'Edit Exercise' : 'New Exercise'}</IonTitle>
                             <IonButtons slot="end">
-                                <IonButton expand="full" onClick={handleSave} className="ion-margin-top">
+                                <IonButton color="primary" expand="full" onClick={handleSave} className="ion-margin-top">
+                                    <IonIcon slot="start" icon={checkmark} />
                                     {editState.id ? 'Update' : 'Save'}
                                 </IonButton>
                                 <IonButton onClick={() => setIsOpen(false)}>Cancel</IonButton>
