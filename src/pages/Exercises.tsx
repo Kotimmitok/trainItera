@@ -2,36 +2,60 @@ import {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent,
     IonList, IonItemSliding, IonItem, IonItemOptions, IonLabel,
     IonItemOption, IonButton, IonModal, IonInput, IonButtons,
-    IonCheckbox
+    IonCheckbox, useIonViewWillEnter
 } from '@ionic/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Exercise, MuscleGroup } from '../db/models/exercise.model';
-import { createExercise, deleteExercise, getExercises } from '../db/repositories/exercises.repository';
+import { createExercise, deleteExercise, getExercises, updateExercise } from '../db/repositories/exercises.repository';
 import { getMuscleGroups } from '../db/repositories/muscle_groups.repository';
+
+interface ExerciseEditState {
+    id: number | null;
+    name: string;
+    muscleGroupIds: number[];
+}
 
 const Exercises: React.FC = () => {
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [muscleGroups, setMuscleGroups] = useState<MuscleGroup[]>([]);
     const [isOpen, setIsOpen] = useState(false);
-    const [name, setName] = useState('');
-    const [selectedMgIds, setSelectedMgIds] = useState<number[]>([]);
+    const [editState, setEditState] = useState<ExerciseEditState>({ id: null, name: '', muscleGroupIds: [] });
 
     const load = async () => {
         setExercises(await getExercises());
         setMuscleGroups(await getMuscleGroups());
     };
 
-    const toggleMuscleGroup = (id: number) => {
-        setSelectedMgIds(prev =>
-            prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-        );
+    const openNew = () => {
+        setEditState({ id: null, name: '', muscleGroupIds: [] });
+        setIsOpen(true);
     };
 
-    const handleAdd = async () => {
-        if (!name.trim()) return;
-        await createExercise(name, selectedMgIds);
-        setName('');
-        setSelectedMgIds([]);
+    const openEdit = (exercise: Exercise) => {
+        setEditState({
+            id: exercise.id,
+            name: exercise.name,
+            muscleGroupIds: exercise.muscle_groups.map(mg => mg.id)
+        });
+        setIsOpen(true);
+    };
+
+    const toggleMuscleGroup = (id: number) => {
+        setEditState(prev => ({
+            ...prev,
+            muscleGroupIds: prev.muscleGroupIds.includes(id)
+                ? prev.muscleGroupIds.filter(x => x !== id)
+                : [...prev.muscleGroupIds, id]
+        }));
+    };
+
+    const handleSave = async () => {
+        if (!editState.name.trim()) return;
+        if (editState.id) {
+            await updateExercise(editState.id, editState.name, editState.muscleGroupIds);
+        } else {
+            await createExercise(editState.name, editState.muscleGroupIds);
+        }
         setIsOpen(false);
         await load();
     };
@@ -41,7 +65,7 @@ const Exercises: React.FC = () => {
         await load();
     };
 
-    useEffect(() => { load(); }, []);
+    useIonViewWillEnter(() => { load(); });
 
     return (
         <IonPage>
@@ -54,7 +78,7 @@ const Exercises: React.FC = () => {
                 <IonList>
                     {exercises.map((exercise) => (
                         <IonItemSliding key={exercise.id}>
-                            <IonItem>
+                            <IonItem button onClick={() => openEdit(exercise)}>
                                 <IonLabel>
                                     <h2>{exercise.name}</h2>
                                     <p>{exercise.muscle_groups.map(mg => mg.name).join(', ')}</p>
@@ -69,15 +93,18 @@ const Exercises: React.FC = () => {
                     ))}
                 </IonList>
 
-                <IonButton expand="full" onClick={() => setIsOpen(true)}>
+                <IonButton expand="full" onClick={openNew}>
                     Add Exercise
                 </IonButton>
 
                 <IonModal isOpen={isOpen} onDidDismiss={() => setIsOpen(false)}>
                     <IonHeader>
                         <IonToolbar>
-                            <IonTitle>New Exercise</IonTitle>
+                            <IonTitle>{editState.id ? 'Edit Exercise' : 'New Exercise'}</IonTitle>
                             <IonButtons slot="end">
+                                <IonButton expand="full" onClick={handleSave} className="ion-margin-top">
+                                    {editState.id ? 'Update' : 'Save'}
+                                </IonButton>
                                 <IonButton onClick={() => setIsOpen(false)}>Cancel</IonButton>
                             </IonButtons>
                         </IonToolbar>
@@ -86,24 +113,21 @@ const Exercises: React.FC = () => {
                         <IonInput
                             label="Exercise name"
                             labelPlacement="floating"
-                            value={name}
-                            onIonInput={(e) => setName(e.detail.value!)}
+                            value={editState.name}
+                            onIonInput={e => setEditState(prev => ({ ...prev, name: e.detail.value! }))}
                         />
                         <IonList>
                             {muscleGroups.map(mg => (
                                 <IonItem key={mg.id}>
                                     <IonCheckbox
                                         slot="start"
-                                        checked={selectedMgIds.includes(mg.id)}
+                                        checked={editState.muscleGroupIds.includes(mg.id)}
                                         onIonChange={() => toggleMuscleGroup(mg.id)}
                                     />
                                     <IonLabel>{mg.name}</IonLabel>
                                 </IonItem>
                             ))}
                         </IonList>
-                        <IonButton expand="full" onClick={handleAdd} className="ion-margin-top">
-                            Save
-                        </IonButton>
                     </IonContent>
                 </IonModal>
             </IonContent>

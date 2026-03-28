@@ -60,3 +60,15 @@ export async function deleteExercise(id: number): Promise<void> {
     const db = await getDb();
     await db.run(`DELETE FROM exercises WHERE id = ?`, [id]);
 }
+
+export async function updateExercise(id: number, name: string, muscleGroupIds: number[]): Promise<void> {
+    const db = await getDb();
+    await db.run(`UPDATE exercises SET name = ? WHERE id = ?`, [name, id]);
+    await db.run(`DELETE FROM exercise_muscle_groups WHERE exercise_id = ?`, [id]);
+    for (const mgId of muscleGroupIds) {
+        await db.run(
+            `INSERT INTO exercise_muscle_groups (exercise_id, muscle_group_id) VALUES (?, ?)`,
+            [id, mgId]
+        );
+    }
+}
