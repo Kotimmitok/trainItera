@@ -36,6 +36,7 @@ import Workouts from './pages/Workouts';
 import Exercises from './pages/Exercises';
 import { useEffect } from 'react';
 import { initDatabase } from './db';
+import RoutineDetail from './pages/RoutineDetail';
 
 setupIonicReact();
 
@@ -54,43 +55,48 @@ const App: React.FC = () => {
 
   return <IonApp>
     <IonReactRouter>
-      <IonTabs>
-        <IonRouterOutlet>
-          <Route exact path="/workouts">
-            <Workouts />
-          </Route>
+      <IonRouterOutlet>
 
-          <Route exact path="/routines">
-            <Routines />
-          </Route>
+        <Route path="/">
+          <IonTabs>
+            <IonRouterOutlet>
+              <Route exact path="/workouts">
+                <Workouts />
+              </Route>
 
-          <Route exact path="/exercises">
-            <Exercises />
-          </Route>
+              <Route exact path="/routines">
+                <Routines />
+              </Route>
+              <Route exact path="/routines/:id" component={RoutineDetail} />
 
-          <Route exact path="/">
-            <Redirect to="/workouts" />
-          </Route>
+              <Route exact path="/exercises">
+                <Exercises />
+              </Route>
 
-        </IonRouterOutlet>
+              <Route exact path="/">
+                <Redirect to="/workouts" />
+              </Route>
 
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="workouts" href="/workouts">
-            <IonLabel>Workouts</IonLabel>
-          </IonTabButton>
+            </IonRouterOutlet>
 
-          <IonTabButton tab="routines" href="/routines">
-            <IonLabel>Routines</IonLabel>
-          </IonTabButton>
+            <IonTabBar slot="bottom">
+              <IonTabButton tab="workouts" href="/workouts">
+                <IonLabel>Workouts</IonLabel>
+              </IonTabButton>
 
-          <IonTabButton tab="exercises" href="/exercises">
-            <IonLabel>Exercises</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
+              <IonTabButton tab="routines" href="/routines">
+                <IonLabel>Routines</IonLabel>
+              </IonTabButton>
 
-      </IonTabs>
+              <IonTabButton tab="exercises" href="/exercises">
+                <IonLabel>Exercises</IonLabel>
+              </IonTabButton>
+            </IonTabBar>
+          </IonTabs>
+        </Route>
+      </IonRouterOutlet>
     </IonReactRouter>
-  </IonApp>
+  </IonApp >
 };
 
 export default App;
