@@ -2,7 +2,7 @@ import { getDb } from "../connection";
 import { Workout, WorkoutExercise, WorkoutSet } from "../models/workout.model";
 import { Routine } from "../models/routine.model";
 
-async function fetchWorkoutsWithExercises(whereClause = '', params: any[] = []): Promise<Workout[]> {
+async function fetchWorkoutsWithExercises(whereClause = '', params: any[] = [], orderBy = 'w.id'): Promise<Workout[]> {
     const db = await getDb();
     const result = await db.query(`
         SELECT
@@ -18,7 +18,7 @@ async function fetchWorkoutsWithExercises(whereClause = '', params: any[] = []):
         LEFT JOIN muscle_groups mg ON emg.muscle_group_id = mg.id
         LEFT JOIN workout_sets ws ON we.id = ws.workout_exercise_id
         ${whereClause}
-        ORDER BY w.id, we.id, ws.id
+        ORDER BY ${orderBy}, we.id, ws.id
     `, params);
 
     const rows = result.values ?? [];
@@ -74,7 +74,7 @@ async function fetchWorkoutsWithExercises(whereClause = '', params: any[] = []):
 }
 
 export async function getWorkouts(): Promise<Workout[]> {
-    return fetchWorkoutsWithExercises('', [],);
+    return fetchWorkoutsWithExercises('', [], 'w.id DESC');
 }
 
 export async function getWorkoutById(id: number): Promise<Workout | null> {
