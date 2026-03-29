@@ -37,6 +37,7 @@ import Exercises from './pages/Exercises';
 import { useEffect } from 'react';
 import { initDatabase } from './db';
 import RoutineDetail from './pages/RoutineDetail';
+import WorkoutDetail from './pages/WorkoutDetail';
 
 setupIonicReact();
 
@@ -63,6 +64,7 @@ const App: React.FC = () => {
               <Route exact path="/workouts">
                 <Workouts />
               </Route>
+              <Route exact path="/workouts/:id" component={WorkoutDetail} />
 
               <Route exact path="/routines">
                 <Routines />
