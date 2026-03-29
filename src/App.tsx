@@ -1,5 +1,5 @@
-import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet, IonTabBar, IonTabButton, IonLabel, setupIonicReact, IonTabs } from '@ionic/react';
+import { Redirect, Route, useHistory } from 'react-router-dom';
+import { IonApp, IonRouterOutlet, IonTabBar, IonTabButton, IonLabel, setupIonicReact, IonTabs, IonIcon } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 
 /* Core CSS required for Ionic components to work properly */
@@ -38,6 +38,8 @@ import { useEffect } from 'react';
 import { initDatabase } from './db';
 import RoutineDetail from './pages/RoutineDetail';
 import WorkoutDetail from './pages/WorkoutDetail';
+import SettingsPage from './pages/Settings';
+import { settingsOutline } from 'ionicons/icons';
 
 setupIonicReact();
 
@@ -75,6 +77,8 @@ const App: React.FC = () => {
                 <Exercises />
               </Route>
 
+              <Route exact path="/settings" component={SettingsPage} />
+
               <Route exact path="/">
                 <Redirect to="/workouts" />
               </Route>
@@ -92,6 +96,9 @@ const App: React.FC = () => {
 
               <IonTabButton tab="exercises" href="/exercises">
                 <IonLabel>Exercises</IonLabel>
+              </IonTabButton>
+              <IonTabButton tab="settings" href="/settings" style={{ maxWidth: '50px' }}>
+                <IonIcon icon={settingsOutline} style={{ fontSize: '1rem' }} />
               </IonTabButton>
             </IonTabBar>
           </IonTabs>
