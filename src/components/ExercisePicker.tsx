@@ -1,7 +1,8 @@
 import {
     IonHeader, IonToolbar, IonTitle, IonContent,
     IonList, IonItem, IonLabel, IonButton, IonButtons,
-    IonSearchbar, IonCheckbox, IonModal, IonInput, IonIcon
+    IonSearchbar, IonCheckbox, IonModal, IonInput, IonIcon,
+    IonToast
 } from '@ionic/react';
 import { addOutline } from 'ionicons/icons';
 import { useState } from 'react';
@@ -22,6 +23,7 @@ const ExercisePicker: React.FC<Props> = ({ exercises, onSelect, onDismiss, onExe
     const [newName, setNewName] = useState('');
     const [muscleGroups, setMuscleGroups] = useState<MuscleGroup[]>([]);
     const [selectedMgIds, setSelectedMgIds] = useState<number[]>([]);
+    const [showToast, setShowToast] = useState(false);
 
     const filteredExercises = exercises.filter(e =>
         e.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -42,7 +44,10 @@ const ExercisePicker: React.FC<Props> = ({ exercises, onSelect, onDismiss, onExe
     };
 
     const handleCreate = async () => {
-        if (!newName.trim()) return;
+        if (!newName.trim()) {
+            setShowToast(true);
+            return;
+        }
         await createExercise(newName, selectedMgIds);
         setIsCreateOpen(false);
         onExercisesChanged();
@@ -119,6 +124,13 @@ const ExercisePicker: React.FC<Props> = ({ exercises, onSelect, onDismiss, onExe
                     </IonList>
                 </IonContent>
             </IonModal>
+            <IonToast
+                isOpen={showToast}
+                onDidDismiss={() => setShowToast(false)}
+                message="Please enter an exercise name."
+                duration={2000}
+                color="danger"
+            />
         </>
     );
 };

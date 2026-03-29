@@ -3,7 +3,8 @@ import {
     IonList, IonItemSliding, IonItem, IonItemOptions, IonLabel,
     IonItemOption, IonButton, IonModal, IonInput, IonButtons,
     IonCheckbox, useIonViewWillEnter,
-    IonIcon
+    IonIcon,
+    IonToast
 } from '@ionic/react';
 import { useState } from 'react';
 import { Exercise, MuscleGroup } from '../db/models/exercise.model';
@@ -22,6 +23,7 @@ const Exercises: React.FC = () => {
     const [muscleGroups, setMuscleGroups] = useState<MuscleGroup[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const [editState, setEditState] = useState<ExerciseEditState>({ id: null, name: '', muscleGroupIds: [] });
+    const [showToast, setShowToast] = useState(false);
 
     const load = async () => {
         setExercises(await getExercises());
@@ -52,7 +54,10 @@ const Exercises: React.FC = () => {
     };
 
     const handleSave = async () => {
-        if (!editState.name.trim()) return;
+        if (!editState.name.trim()) {
+            setShowToast(true);
+            return;
+        }
         if (editState.id) {
             await updateExercise(editState.id, editState.name, editState.muscleGroupIds);
         } else {
@@ -135,6 +140,14 @@ const Exercises: React.FC = () => {
                         </IonList>
                     </IonContent>
                 </IonModal>
+                <IonToast
+                    isOpen={showToast}
+                    onDidDismiss={() => setShowToast(false)}
+                    message="Please enter an exercise name."
+                    duration={2000}
+                    color="danger"
+                />
+
             </IonContent>
         </IonPage>
     );
