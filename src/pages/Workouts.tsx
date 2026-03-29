@@ -46,7 +46,7 @@ const Workouts: React.FC = () => {
     const formatDuration = (started: string, finished: string | null) => {
         if (!finished) return 'In progress';
         const diff = new Date(finished).getTime() - new Date(started).getTime();
-        const mins = Math.floor(diff / 60000);
+        const mins = Math.ceil(diff / 60000);
         return `${mins} min`;
     };
 
