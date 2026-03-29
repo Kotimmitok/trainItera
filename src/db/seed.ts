@@ -1,4 +1,5 @@
 import { getDb } from "./connection";
+import { SQLiteDBConnection } from '@capacitor-community/sqlite';
 
 const MUSCLE_GROUPS = [
     'Chest',
@@ -66,6 +67,80 @@ const EXERCISES: { name: string; muscle_groups: string[] }[] = [
     { name: 'Stair Climber', muscle_groups: ['Quads', 'Glutes', 'Calves'] },
 ];
 
+const ROUTINE_SEEDS = [
+    {
+        name: 'Push',
+        exercises: [
+            { name: 'Bench Press', sets: [{ reps: 8, weight: 80 }, { reps: 8, weight: 80 }, { reps: 8, weight: 80 }] },
+            { name: 'Incline Bench Press', sets: [{ reps: 10, weight: 60 }, { reps: 10, weight: 60 }, { reps: 10, weight: 60 }] },
+            { name: 'Overhead Press', sets: [{ reps: 8, weight: 50 }, { reps: 8, weight: 50 }, { reps: 8, weight: 50 }] },
+            { name: 'Lateral Raise', sets: [{ reps: 12, weight: 12 }, { reps: 12, weight: 12 }, { reps: 12, weight: 12 }] },
+            { name: 'Tricep Pushdown', sets: [{ reps: 12, weight: 30 }, { reps: 12, weight: 30 }, { reps: 12, weight: 30 }] },
+        ]
+    },
+    {
+        name: 'Pull',
+        exercises: [
+            { name: 'Deadlift', sets: [{ reps: 5, weight: 100 }, { reps: 5, weight: 100 }, { reps: 5, weight: 100 }] },
+            { name: 'Barbell Row', sets: [{ reps: 8, weight: 70 }, { reps: 8, weight: 70 }, { reps: 8, weight: 70 }] },
+            { name: 'Lat Pulldown', sets: [{ reps: 10, weight: 60 }, { reps: 10, weight: 60 }, { reps: 10, weight: 60 }] },
+            { name: 'Bicep Curl', sets: [{ reps: 12, weight: 15 }, { reps: 12, weight: 15 }, { reps: 12, weight: 15 }] },
+            { name: 'Face Pull', sets: [{ reps: 15, weight: 20 }, { reps: 15, weight: 20 }, { reps: 15, weight: 20 }] },
+        ]
+    },
+    {
+        name: 'Legs',
+        exercises: [
+            { name: 'Squat', sets: [{ reps: 8, weight: 90 }, { reps: 8, weight: 90 }, { reps: 8, weight: 90 }] },
+            { name: 'Romanian Deadlift', sets: [{ reps: 10, weight: 70 }, { reps: 10, weight: 70 }, { reps: 10, weight: 70 }] },
+            { name: 'Leg Press', sets: [{ reps: 12, weight: 120 }, { reps: 12, weight: 120 }, { reps: 12, weight: 120 }] },
+            { name: 'Leg Curl', sets: [{ reps: 12, weight: 40 }, { reps: 12, weight: 40 }, { reps: 12, weight: 40 }] },
+            { name: 'Calf Raise', sets: [{ reps: 15, weight: 50 }, { reps: 15, weight: 50 }, { reps: 15, weight: 50 }] },
+        ]
+    }
+];
+
+async function seedRoutines(db: SQLiteDBConnection): Promise<void> {
+    const exResult = await db.query(`SELECT id, name FROM exercises`);
+    const exMap = new Map<string, number>(
+        (exResult.values ?? []).map(row => [row.name, row.id])
+    );
+
+    for (const routine of ROUTINE_SEEDS) {
+        const existing = await db.query(
+            `SELECT id FROM routines WHERE name = ?`, [routine.name]
+        );
+        if (existing.values && existing.values.length > 0) continue;
+
+        await db.run(`INSERT INTO routines (name) VALUES (?)`, [routine.name]);
+        const rResult = await db.query(
+            `SELECT id FROM routines WHERE name = ? ORDER BY id DESC LIMIT 1`, [routine.name]
+        );
+        const routineId = rResult.values?.[0]?.id;
+
+        for (const exercise of routine.exercises) {
+            const exerciseId = exMap.get(exercise.name);
+            if (!exerciseId) continue;
+
+            await db.run(
+                `INSERT INTO routine_exercises (routine_id, exercise_id) VALUES (?, ?)`,
+                [routineId, exerciseId]
+            );
+            const reResult = await db.query(
+                `SELECT id FROM routine_exercises ORDER BY id DESC LIMIT 1`
+            );
+            const reId = reResult.values?.[0]?.id;
+
+            for (const set of exercise.sets) {
+                await db.run(
+                    `INSERT INTO routine_sets (routine_exercise_id, reps, weight) VALUES (?, ?, ?)`,
+                    [reId, set.reps, set.weight]
+                );
+            }
+        }
+    }
+}
+
 export async function seedDatabase(): Promise<void> {
     const db = await getDb();
 
@@ -105,4 +180,6 @@ export async function seedDatabase(): Promise<void> {
             }
         }
     }
+
+    await seedRoutines(db);
 }
