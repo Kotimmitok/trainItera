@@ -18,6 +18,7 @@ import {
 } from '../db/repositories/workouts.repository';
 import { getExercises } from '../db/repositories/exercises.repository';
 import { useTimer } from '../hooks/useTimer';
+import ExercisePicker from '../components/ExercisePicker';
 
 const WorkoutDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -246,38 +247,13 @@ const WorkoutDetail: React.FC = () => {
                 )}
 
                 {/* Exercise Picker Modal */}
-                <IonModal
-                    isOpen={isPickerOpen}
-                    onDidDismiss={() => { setIsPickerOpen(false); setSearch(''); }}
-                >
-                    <IonHeader>
-                        <IonToolbar>
-                            <IonTitle>Add Exercise</IonTitle>
-                            <IonButtons slot="end">
-                                <IonButton onClick={() => setIsPickerOpen(false)}>Cancel</IonButton>
-                            </IonButtons>
-                        </IonToolbar>
-                        <IonToolbar>
-                            <IonSearchbar
-                                value={search}
-                                onIonInput={e => setSearch(e.detail.value!)}
-                                placeholder="Search by name or muscle group..."
-                                debounce={0}
-                            />
-                        </IonToolbar>
-                    </IonHeader>
-                    <IonContent>
-                        <IonList>
-                            {filteredExercises.map(exercise => (
-                                <IonItem key={exercise.id} button onClick={() => handleAddExercise(exercise)}>
-                                    <IonLabel>
-                                        <h2>{exercise.name}</h2>
-                                        <p>{exercise.muscle_groups.map(mg => mg.name).join(', ')}</p>
-                                    </IonLabel>
-                                </IonItem>
-                            ))}
-                        </IonList>
-                    </IonContent>
+                <IonModal isOpen={isPickerOpen} onDidDismiss={() => { setIsPickerOpen(false); }}>
+                    <ExercisePicker
+                        exercises={exercises}
+                        onSelect={handleAddExercise}
+                        onDismiss={() => setIsPickerOpen(false)}
+                        onExercisesChanged={async () => setExercises(await getExercises())}
+                    />
                 </IonModal>
             </IonContent>
         </IonPage>

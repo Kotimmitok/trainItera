@@ -77,7 +77,7 @@ const Exercises: React.FC = () => {
                     <IonButtons slot="end">
                         <IonButton color="primary" expand="full" onClick={openNew}>
                             <IonIcon slot="start" icon={addOutline} />
-                            Add Exercise
+                            New
                         </IonButton>
                     </IonButtons>
                 </IonToolbar>
