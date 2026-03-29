@@ -2,7 +2,8 @@ import {
     IonPage, IonHeader, IonToolbar, IonTitle, IonContent,
     IonList, IonItemSliding, IonItem, IonItemOptions, IonItemOption,
     IonLabel, IonButton, IonModal, IonButtons, IonIcon,
-    useIonViewWillEnter
+    useIonViewWillEnter,
+    IonNote
 } from '@ionic/react';
 import { addOutline } from 'ionicons/icons';
 import { useState } from 'react';
@@ -49,6 +50,14 @@ const Workouts: React.FC = () => {
         return `${mins} min`;
     };
 
+    const daysAgo = (dateStr: string) => {
+        const diff = Date.now() - new Date(dateStr).getTime();
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        if (days === 0) return 'Today';
+        if (days === 1) return 'Yesterday';
+        return `${days} days ago`;
+    };
+
     useIonViewWillEnter(() => { load(); });
 
     return (
@@ -75,6 +84,9 @@ const Workouts: React.FC = () => {
                                     <p>{formatDuration(workout.started_at, workout.finished_at)}</p>
                                     {!workout.finished_at && <p><WorkoutTimer startedAt={workout.started_at} finishedAt={workout.finished_at} /></p>}
                                 </IonLabel>
+                                <IonNote slot="end" style={{ alignSelf: 'center' }}>
+                                    {daysAgo(workout.started_at)}
+                                </IonNote>
                             </IonItem>
                             <IonItemOptions side="end">
                                 <IonItemOption color="danger" onClick={() => handleDelete(workout.id)}>
