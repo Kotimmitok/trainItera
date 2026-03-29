@@ -3,7 +3,8 @@ import {
     IonList, IonItemSliding, IonItem, IonItemOptions, IonItemOption,
     IonLabel, IonButton, IonModal, IonInput, IonButtons,
     useIonViewWillEnter,
-    IonIcon
+    IonIcon,
+    IonToast
 } from '@ionic/react';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
@@ -15,6 +16,7 @@ const Routines: React.FC = () => {
     const [routines, setRoutines] = useState<Routine[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const [name, setName] = useState('');
+    const [showToast, setShowToast] = useState(false);
     const history = useHistory();
 
     const load = async () => {
@@ -23,11 +25,15 @@ const Routines: React.FC = () => {
     };
 
     const handleAdd = async () => {
+        if (!name.trim()) {
+            setShowToast(true);
+            return;
+        }
         try {
-            await createRoutine(name);
+            const routineId = await createRoutine(name);
             setName('');
             setIsOpen(false);
-            await load();
+            history.push(`/routines/${routineId}`);
         } catch (err) {
             console.error('createRoutine error:', err);
         }
@@ -103,6 +109,14 @@ const Routines: React.FC = () => {
                         />
                     </IonContent>
                 </IonModal>
+                <IonToast
+                    isOpen={showToast}
+                    onDidDismiss={() => setShowToast(false)}
+                    message="Please enter a routine name."
+                    duration={2000}
+                    color="danger"
+                />
+
             </IonContent>
         </IonPage>
     );

@@ -3,7 +3,8 @@ import {
     IonList, IonItemSliding, IonItem, IonItemOptions, IonItemOption,
     IonLabel, IonButton, IonModal, IonInput, IonButtons,
     IonBackButton, IonSearchbar, IonIcon, IonGrid, IonRow, IonCol,
-    useIonViewWillEnter
+    useIonViewWillEnter,
+    IonToast
 } from '@ionic/react';
 import { addOutline, checkmark, trashOutline } from 'ionicons/icons';
 import { useState } from 'react';
@@ -33,6 +34,7 @@ const RoutineDetail: React.FC = () => {
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const [isConfigOpen, setIsConfigOpen] = useState(false);
     const [search, setSearch] = useState('');
+    const [showToast, setShowToast] = useState(false);
 
     const [editState, setEditState] = useState<ExerciseEditState | null>(null);
 
@@ -102,7 +104,10 @@ const RoutineDetail: React.FC = () => {
     };
 
     const handleRename = async () => {
-        if (!newName.trim()) return;
+        if (!newName.trim()) {
+            setShowToast(true);
+            return;
+        }
         await renameRoutine(Number(id), newName);
         setIsRenameOpen(false);
         await load();
@@ -200,6 +205,13 @@ const RoutineDetail: React.FC = () => {
                         </IonButton>
                     </IonContent>
                 </IonModal>
+                <IonToast
+                    isOpen={showToast}
+                    onDidDismiss={() => setShowToast(false)}
+                    message="Please enter a routine name."
+                    duration={2000}
+                    color="danger"
+                />
 
                 {/* Exercise Picker Modal */}
                 <IonModal isOpen={isPickerOpen} onDidDismiss={() => setIsPickerOpen(false)}>
